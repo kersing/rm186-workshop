@@ -7,7 +7,7 @@ Ga naar [de SIlabs download pagina](https://www.silabs.com/products/development-
 Pak de ZIP file uit. Plug nu de adapter in de laptop. Gebruik 'Windows'-X Apparaat Beheer en kies het apparaat met een uitroepteken. Update de drivers van de lokale PC door naar de map waarin deze uitgepakt zijn te bladeren.
 
 ## OSX
-Installeer de driver. Steek de adapter in de USB poort. Als er nu geen nieuwe device in /dev zichtbaar wordt, raadpleeg dan [dir stackoverlow artikel](https://stackoverflow.com/questions/47109036/cp2102-device-is-not-listed-in-dev-on-macos-10-13)
+Installeer de driver. Steek de adapter in de USB poort. Als er nu geen nieuwe device in /dev zichtbaar wordt, raadpleeg dan [dit stackoverlow artikel](https://stackoverflow.com/questions/47109036/cp2102-device-is-not-listed-in-dev-on-macos-10-13)
 
 ## De adapter testen
 Om te testen of de adapter correct werkt plaatsen we een jumper over de RX en TX pin.

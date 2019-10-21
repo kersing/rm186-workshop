@@ -16,7 +16,7 @@ De strip kan simpel gebroken worden tussen twee pinnen waar het plastic dunner i
 ## Solderen
 Op onderstaande foto is met kleuren aangegeven welke onderdelen waar moeten komen.
 
-![hardware](generic-node-screw.jpg)
+![hardware](images/generic-node-screw.jpg)
 
 Houdt bij het solderen de volgende volgorde aan:
 1. De 3 weerstanden (rood)
