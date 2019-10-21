@@ -1,0 +1,25 @@
+#include "RM1xx-defs.h"
+#include "sleep.sblib"
+
+DIM rc
+DIM val$
+DIM i
+DIM voltage
+DIM temp
+
+rc = GPIOSetFunc(6, 3, 0x11)
+
+FOR i = 1 TO 20
+  rc = GpioRead(6)
+  // Operation mode is 2/3 Vcc with 10 bit precision.
+  // Vref= 1.2V, using prescaling 2/3 is 1.8V = 1023.
+  // one step = 1800 / 1024 = 900 / 512 = 450 / 256 = 225 / 128 mv
+  //voltage = (rc * 225) /128
+  // Operation mode is 1/1 prescaling with 10 bit precision
+  // Vref = 1.2V
+  // one step = 1200 / 1024 = 600 / 512 = 300 / 256 = 150 / 128
+  voltage = (rc * 150) / 128
+  temp = voltage - 500 // because of TMP36 offset
+  print voltage;", ";temp/10;".";temp%10;"\n"
+  Sleep(1000)
+NEXT

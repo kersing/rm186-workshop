@@ -1,0 +1,10 @@
+#include "RM1xx-defs.h"
+
+DIM rc
+DIM val$
+
+rc = LORAMACGetOption(LORAMAC_OPT_DEV_EUI, val$)
+PRINT "Laird EUI: ";val$;"\n"
+rc = LORAMACGetOption(LORAMAC_OPT_CUSTOM_DEV_EUI, val$)
+PRINT "Set EUI: ";val$;"\n"
+
