@@ -34,8 +34,8 @@ Knip en plak de uitvoer van het programma naar de 'Device EUI' op de webpagina e
 
 De node is nu aangemeld bij een nieuwe applicatie op TTN. Nu moeten we de node configureren met de gegevens van de applicatie, namelijk de Application EUI en de App Key.
 
-Type in UwTerminalX de commandos:
-AT +CFGEX 1010 "Application EUI van de TTN webpagina"
-AT +CFGEX 1012 "App Key van de TTN webpagina"
+Type in UwTerminalX de commando's:
+- AT +CFGEX 1010 "Application EUI van de TTN webpagina"
+- AT +CFGEX 1012 "App Key van de TTN webpagina"
 
 Deze instellingen worden pas actief na een reset, dus besluit met "ATZ".
