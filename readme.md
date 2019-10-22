@@ -11,7 +11,7 @@
 - [Herhalen](workshop1/repeat.md)
 - [Nieuwe applicatie bij TTN](workshop1/application.md)
 - [Basis LoRaWAN programma](workshop1/basis.md)
-- Automatisch starten van een programma
+- [Automatisch starten van een programma](workshop1/autostart.md)
 - [Aansluitingen voor sensoren e.d.](workshop1/aansluitingen.md)
 
 ## Volgende Workshops
