@@ -38,4 +38,6 @@ Type in UwTerminalX de commando's:
 - AT +CFGEX 1010 "Application EUI van de TTN webpagina"
 - AT +CFGEX 1012 "App Key van de TTN webpagina"
 
+N.B. De aanhalingstekens zijn onderdeel van het commando. Zonder aanhalingstekens geeft de module een antwoord ongelijk aan 00, hetgeen betekend dat de sleutels niet geaccepteerd/opgeslagen zijn.
+
 Deze instellingen worden pas actief na een reset, dus besluit met "ATZ".
