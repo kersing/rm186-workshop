@@ -26,7 +26,7 @@ DIM val$
 rc = LORAMACGetOption(LORAMAC_OPT_DEV_EUI, val$)
 PRINT "EUI: ";val$;"\n"
 ````
-[RM1xx-defs.h](RM1xx-defs.h)
+[RM1xx-defs.h](software/RM1xx-defs.h)
 
 Knip en plak de uitvoer van het programma naar de 'Device EUI' op de webpagina en klik op 'Register'.
 
