@@ -26,7 +26,7 @@ DIM val$
 rc = LORAMACGetOption(LORAMAC_OPT_DEV_EUI, val$)
 PRINT "EUI: ";val$;"\n"
 ````
-[RM1xx-defs.h](RM1xx-defs.h)
+[RM1xx-defs.h](software/RM1xx-defs.h)
 
 Knip en plak de uitvoer van het programma naar de 'Device EUI' op de webpagina en klik op 'Register'.
 
@@ -37,5 +37,7 @@ De node is nu aangemeld bij een nieuwe applicatie op TTN. Nu moeten we de node c
 Type in UwTerminalX de commando's:
 - AT +CFGEX 1010 "Application EUI van de TTN webpagina"
 - AT +CFGEX 1012 "App Key van de TTN webpagina"
+
+N.B. De aanhalingstekens zijn onderdeel van het commando. Zonder aanhalingstekens geeft de module een antwoord ongelijk aan 00, hetgeen betekend dat de sleutels niet geaccepteerd/opgeslagen zijn.
 
 Deze instellingen worden pas actief na een reset, dus besluit met "ATZ".
