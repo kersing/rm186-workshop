@@ -6,10 +6,10 @@
 
 
 // Definieer de zend interval en eerste zend interval
-#define INTERVAL ( 1 * 60 * 1000 ) // 1 minuut
+// #define INTERVAL ( 1 * 60 * 1000 ) // 1 minuut
 
 
-// #define INTERVAL ( 5 * 60 * 1000 ) // 5 minuten
+#define INTERVAL ( 5 * 60 * 1000 ) // 5 minuten
 
 #define FIRSTINT ( 10 * 1000 ) // 10 seconden
 
@@ -50,23 +50,30 @@ FUNCTION SendData() AS Integer
 	DIM sds$
 	DIM pm10
 	DIM pm25
-	Dim CayenneLPP$
+	Dim BinaryData$
 
 	// PRINT "SendData, joined = ";joined;"\n"
 	TimerCancel(1)
 	IF joined == 1 THEN
-		// Cayenne LPP Low Power Payload format
-		// Channel 1, temperature 2 bytes signed index 2,3
-		// channel 2, Humidity 1 byte unsigned index 6
-		// Channel 3, Pressure 2 bytes unsigned index 9, 10
-		// Channel 4, Analog input SDS011 PM25 2 bytes unsigned index 13, 14
-		// Channel 5, Analog input SDS011 PM10 2 bytes  index 17, 18
-		CayenneLPP$ = "\01\67\00\00\02\68\00\03\73\00\00\04\02\00\00\05\02\00\00"
+		// Binary Data
+		// Temperature mulplied 100, signed int16 index 0,1  
+		// Humidity 2 bytes unsigned index 2,3
+		// Pressure 2 bytes unsigned index 4,5
+		// SDS011 PM25 2 bytes unsigned index 6,7
+		// SDS011 PM10 2 bytes unsigned index 8,9
+		BinaryData$ = "\00\00\00\00\00\00\00\00\00\00"
 
 		BME280_Read_Raw()
+
 		temp = BME280_Read_Temp()
+
 		pressure = BME280_Read_Pressure()
+		// Get rid of 1 decimal so it fits in two bytes
+		pressure = pressure/10
+		
 		humidity = BME280_Read_Humidity()
+		// Get rid of 1 decimal so it fits in two bytes
+		humidity = humidity/10
 		
 		SDS011Start()
 		Sleep(30000)
@@ -79,22 +86,25 @@ FUNCTION SendData() AS Integer
 			pm10 = SDS011GetPM10(sds$)
 		ENDIF
 
-		iResult = StrSetChr(CayenneLPP$,temp/256,2)
-		iResult = StrSetChr(CayenneLPP$,temp%256,3)
+		iResult = StrSetChr(BinaryData$,temp/256,0)
+		iResult = StrSetChr(BinaryData$,temp%256,1)
 		
-		iResult = StrSetChr(CayenneLPP$,humidity/256,6)
-		iResult = StrSetChr(CayenneLPP$,pressure/256,9)
-		iResult = StrSetChr(CayenneLPP$,pressure%256,10)
+		iResult = StrSetChr(BinaryData$,humidity/256,2)
+		iResult = StrSetChr(BinaryData$,humidity%256,3)
+		
+		
+		iResult = StrSetChr(BinaryData$,pressure/256,4)
+		iResult = StrSetChr(BinaryData$,pressure%256,5)
 
-		iResult = StrSetChr(CayenneLPP$,pm25/256,13)
-		iResult = StrSetChr(CayenneLPP$,pm25%256,14)
+		iResult = StrSetChr(BinaryData$,pm25/256,6)
+		iResult = StrSetChr(BinaryData$,pm25%256,7)
 
-		iResult = StrSetChr(CayenneLPP$,pm10/256,17)
-		iResult = StrSetChr(CayenneLPP$,pm10%256,18)
+		iResult = StrSetChr(BinaryData$,pm10/256,8)
+		iResult = StrSetChr(BinaryData$,pm10%256,9)
 		
 
 		// PRINT "Sending data\n"
-		rc = LORAMACTxData(1,CayenneLPP$,0)
+		rc = LORAMACTxData(1,BinaryData$,0)
 		// PRINT "Send rc:";rc;"\n"
 	else
 		// PRINT "Attemp join again\n"
@@ -131,18 +141,9 @@ rc = BME280_Open(BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,0)
 if (rc == 0) then
     print "BME open\nRead callibration\n"
     BME280_ReadCallibarationVals()
+
 	Sleep(2000)
 
-    PRINT "\nstarting LoRaWAN operation\n"
-
-    // Start LoRaWAN, Start timer en start Join procedure
-    joined = 0
-    PRINT "Start joining\n"
-    rc = LORAMACJoin(1)
-
-	print "Be sure to disconnect tx/rx from Laird because of SDS011. Yoh have 20s :-)\n"
-	Sleep(20000)
-	
 	// We want the uart clean before we open it for the SDS011
 	UartClose()
 	
@@ -154,6 +155,15 @@ if (rc == 0) then
 	Sleep(2000)
 	UartFlush(3)
 	UartClose()
+
+    PRINT "\nstarting LoRaWAN operation\n"
+
+    // Start LoRaWAN, Start timer en start Join procedure
+    joined = 0
+    
+	PRINT "Start joining\n"
+	PRINT "Be sure to disconnect tx/rx from Laird because of SDS011.\n"
+    rc = LORAMACJoin(1)
 
     TimerStart(1, INTERVAL, 0)
 	
