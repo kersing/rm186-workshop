@@ -1,0 +1,48 @@
+#include "RM1xx-defs.h"
+#include "sleep.sblib"
+#include "bme280.sblib"
+
+DIM rc
+
+rc = BME280_Open(BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,0)
+if (rc != 0) then
+    print "BME280 failed "
+    PRINT "\nFailed to open I2C interface with error code "; INTEGER.h' rc
+    print rc
+    print "\n"
+else
+    print "BME open\nRead callibration\n"
+    BME280_ReadCallibarationVals()
+    rc = BME280_Read(BME280_REG_ID)
+    print "ID: "
+    print rc
+    print "\n"
+	while (1)
+		BME280_Read_Raw()
+		print "Temp: "
+		rc = BME280_Read_Temp()
+		if (rc % 100 < 10) then
+			print rc/100;".0";rc%100; "\n"
+		else
+			print rc/100;".";rc%100; "\n"
+		endif
+		rc = BME280_Read_Humidity()
+		// Get rid off third decimal which is not useful anyway
+		rc = rc / 10
+		print "Humidity: "
+		if (rc % 100 < 10) then
+			print rc/100;".00";rc%100; "\n"
+		else
+			print rc/100;".";rc%100; "\n"
+		endif
+		rc = BME280_Read_Pressure()
+		print "Pressure: "
+		if (rc % 100 < 10) then
+			print rc/100;".00";rc%100; "\n"
+		else
+			print rc/100;".";rc%100; "\n"
+		endif
+		Sleep(10000)
+	endwhile
+    BME280_Close()
+endif

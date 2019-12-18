@@ -1,0 +1,246 @@
+//**************************************************************************
+// BME280 library
+//
+// © Copyright 2019 by The-Box Development
+// written by Jac Kersing based on BME280 datasheet © Bosch Sensortec GmbH
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//**************************************************************************
+
+#define BME280_ADDRESS          0x76
+#define BME280_I2CSpeed         100000
+
+#define BME280_REG_ID           0xd0
+#define BME280_REG_RESET        0xe0
+#define BME280_REG_CTRL_HUM     0xf2
+#define BME280_REG_STATUS       0xf3
+#define BME280_REG_CTRL_MEAS    0xf4
+#define BME280_REG_CONFIG       0xf5
+#define BME280_REG_PRESS_MSB    0xf7
+#define BME280_REG_PRESS_LSB    0xf8
+#define BME280_REG_PRESS_XLSB   0xf9
+#define BME280_REG_TEMP_MSB     0xfa
+#define BME280_REG_TEMP_LSB     0xfb
+#define BME280_REG_TEMP_XLSB    0xfc
+#define BME280_REG_HUM_MSB      0xfd
+#define BME280_REG_HUM_LSB      0xfe
+
+#define BME280_SKIPSAMPLE       0x00
+#define BME280_OVERSAMPLE1      0x01
+#define BME280_OVERSAMPLE2      0x02
+#define BME280_OVERSAMPLE4      0x03
+#define BME280_OVERSAMPLE8      0x04
+#define BME280_OVERSAMPLE16     0x05
+
+#define BME280_TRIM_DIG_T1      0x88
+#define BME280_TRIM_DIG_T2      0x8a
+#define BME280_TRIM_DIG_T3      0x8c
+#define BME280_TRIM_DIG_P1      0x8e
+#define BME280_TRIM_DIG_P2      0x90
+#define BME280_TRIM_DIG_P3      0x92
+#define BME280_TRIM_DIG_P4      0x94
+#define BME280_TRIM_DIG_P5      0x96
+#define BME280_TRIM_DIG_P6      0x98
+#define BME280_TRIM_DIG_P7      0x9a
+#define BME280_TRIM_DIG_P8      0x9c
+#define BME280_TRIM_DIG_P9      0x9e
+#define BME280_TRIM_DIG_H1      0xa1
+#define BME280_TRIM_DIG_H2      0xe1
+#define BME280_TRIM_DIG_H3      0xe3
+#define BME280_TRIM_DIG_H4      0xe4
+#define BME280_TRIM_DIG_H5      0xe5
+#define BME280_TRIM_DIG_H6      0xe7
+
+
+DIM BME280_DIG_T1
+DIM BME280_DIG_T2
+DIM BME280_DIG_T3
+DIM BME280_DIG_P1
+DIM BME280_DIG_P2
+DIM BME280_DIG_P3
+DIM BME280_DIG_P4
+DIM BME280_DIG_P5
+DIM BME280_DIG_P6
+DIM BME280_DIG_P7
+DIM BME280_DIG_P8
+DIM BME280_DIG_P9
+DIM BME280_DIG_H1
+DIM BME280_DIG_H2
+DIM BME280_DIG_H3
+DIM BME280_DIG_H4
+DIM BME280_DIG_H5
+DIM BME280_DIG_H6
+
+DIM BME280_handle
+DIM BME280_rc
+DIM BME280_fine
+DIM BME280_fetchmode
+DIM BME280_humidity_sampling
+DIM BME280_temperature_sampling
+DIM BME280_pressure_sampling
+DIM BME280_raw_temp
+DIM BME280_raw_hum
+DIM BME280_raw_press
+
+FUNCTION BME280_Read(register)
+    DIM value
+    BME280_rc = I2cReadReg8(BME280_ADDRESS, register, value)
+    if (BME280_rc != 0) then
+        print "READ ERROR\n"
+    endif
+ENDFUNC value
+
+SUB BME280_Write(register, value)
+    DIM rc
+    rc = I2cWriteReg8(BME280_ADDRESS, register, value)
+ENDSUB
+
+FUNCTION BME280_Open(temp_sample, hum_sample, press_sample, mode)
+    BME280_rc = I2cOpen(BME280_I2CSpeed, 0, BME280_handle)
+    BME280_humidity_sampling = hum_sample
+    BME280_temperature_sampling = temp_sample
+    BME280_pressure_sampling = press_sample
+    BME280_fetchmode = mode
+    BME280_Write(BME280_REG_RESET, 0xb6)
+    Sleep(200)
+ENDFUNC BME280_rc
+
+SUB BME280_Close()
+    I2CClose(BME280_handle)
+ENDSUB
+
+FUNCTION BME280_RS(offset)
+	DIM val
+	
+	val =  BME280_Read(offset+1)
+	IF val & 0x80 THEN
+		val = val | 0xffffff00
+	ENDIF
+	val = val << 8
+	val = val | BME280_Read(offset)
+ENDFUNC val
+
+SUB BME280_ReadCallibarationVals()
+    BME280_DIG_T1 = (BME280_Read(BME280_TRIM_DIG_T1) + 256 * BME280_Read(BME280_TRIM_DIG_T1+1)) & 0xffff
+    BME280_DIG_T2 = BME280_RS(BME280_TRIM_DIG_T2)
+    BME280_DIG_T3 = BME280_RS(BME280_TRIM_DIG_T3)
+
+    BME280_DIG_P1 = (BME280_Read(BME280_TRIM_DIG_P1) + 256 * BME280_Read(BME280_TRIM_DIG_P1+1)) & 0xffff
+    BME280_DIG_P2 = BME280_RS(BME280_TRIM_DIG_P2)
+    BME280_DIG_P3 = BME280_RS(BME280_TRIM_DIG_P3)
+    BME280_DIG_P4 = BME280_RS(BME280_TRIM_DIG_P4)
+    BME280_DIG_P5 = BME280_RS(BME280_TRIM_DIG_P5)
+    BME280_DIG_P6 = BME280_RS(BME280_TRIM_DIG_P6)
+    BME280_DIG_P7 = BME280_RS(BME280_TRIM_DIG_P7)
+    BME280_DIG_P8 = BME280_RS(BME280_TRIM_DIG_P8)
+    BME280_DIG_P9 = BME280_RS(BME280_TRIM_DIG_P9)
+
+    BME280_DIG_H1 = BME280_Read(BME280_TRIM_DIG_H1)
+    BME280_DIG_H2 = BME280_RS(BME280_TRIM_DIG_H2)
+    BME280_DIG_H3 = BME280_Read(BME280_TRIM_DIG_H3)
+    BME280_DIG_H4 = (BME280_Read(BME280_TRIM_DIG_H4) << 4) + (BME280_Read(BME280_TRIM_DIG_H5) & 0xf)
+    BME280_DIG_H5 = ((BME280_Read(BME280_TRIM_DIG_H5) >> 4) & 0xf) + (BME280_Read(BME280_TRIM_DIG_H5+1) << 4)
+    BME280_DIG_H6 = BME280_Read(BME280_TRIM_DIG_H6)
+ENDSUB
+
+SUB BME280_Read_Raw()
+    DIM value
+    DIM mode
+    mode = BME280_humidity_sampling
+    BME280_Write(BME280_REG_CTRL_HUM, mode)
+    mode = (BME280_temperature_sampling << 5) | (BME280_pressure_sampling << 2) | 1
+    BME280_Write(BME280_REG_CTRL_MEAS, mode)
+    mode = 245 + 230 * (BME280_temperature_sampling + BME280_pressure_sampling + BME280_humidity_sampling)
+    Sleep(mode / 10)
+	
+	BME280_raw_press = ((BME280_Read(BME280_REG_PRESS_MSB) << 16) + ( BME280_Read(BME280_REG_PRESS_LSB) << 8) + BME280_Read(BME280_REG_PRESS_LSB)) >> 4
+	BME280_raw_temp = ( (BME280_Read(BME280_REG_TEMP_MSB) << 16) + ( BME280_Read(BME280_REG_TEMP_LSB) << 8 ) + BME280_Read(BME280_REG_TEMP_XLSB)) >> 4
+    BME280_raw_hum = (BME280_Read(BME280_REG_HUM_MSB) << 8) | BME280_Read(BME280_REG_HUM_LSB)
+ENDSUB
+
+FUNCTION BME280_Read_Temp()
+    DIM value
+    DIM var1, var2
+    if (BME280_fetchmode != 0) then
+        BME280_Read_Raw()
+    endif
+    var1 = (BME280_raw_temp / 8) - (BME280_DIG_T1 * 2)
+    var1 = (var1 * BME280_DIG_T2) / 2048
+    var2 = (BME280_raw_temp / 16) - BME280_DIG_T1
+    var2 = (((var2 * var2) / 4096) * BME280_DIG_T3) / 16384
+    BME280_fine = var1 + var2
+    value = (BME280_fine * 5 + 128) / 256
+ENDFUNC value
+
+FUNCTION BME280_Read_Humidity()
+    DIM var1, var2, var3, var4, var5
+    if (BME280_fetchmode != 0) then
+        BME280_Read_Raw()
+    endif
+    var1 = BME280_fine - 76800
+	var2 = BME280_raw_hum * 16384
+	var3 = BME280_DIG_H4 * 1048576
+	var4 = BME280_DIG_H5 * var1
+	var5 = (((var2 - var3) - var4) + 16384) / 32768
+	var2 = (var1 * BME280_DIG_H6) / 1024
+	var3 = (var1 * BME280_DIG_H3) / 2048
+	var4 = ((var2 * (var3 + 32768)) / 1024) + 2097152
+	var2 = ((var4 * BME280_DIG_H2) + 8192) / 16384
+	var3 = var5 * var2
+	var4 = ((var3 / 32768) * (var3 / 32768)) / 128
+	var5 = var3 - ((var4 * BME280_DIG_H1) / 16)
+    if (var5 < 0) then
+        var5 = 0
+    endif
+
+    if (var5 > 419430400) then
+        var5 = 419430400
+    endif
+    var5 = var5 / 4096
+    if (var5 > 100000) then
+        var5 = 100000
+    endif
+ENDFUNC var5
+
+FUNCTION BME280_Read_Pressure()
+    DIM var1, var2, var3, var4
+	DIM p
+
+    var1 = (BME280_fine>>1) - 64000
+	var2 = ((( var1 >> 2) * (var1 >> 2)) >> 11) * BME280_DIG_P6
+	var2 = var2 + ((var1 * BME280_DIG_P5) << 1)
+	var2 = (var2 >>2) + (BME280_DIG_P4 << 16)
+	var1 = (((BME280_DIG_P3 * ((( var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + (((BME280_DIG_P2) * var1 ) >> 1 )) >> 18
+    var1 = ((((32768 + var1)) * BME280_DIG_P1)) >> 15
+	if (var1 != 0) then
+		p = 1048576 - BME280_raw_press
+		p = p - (var2 >> 12)
+		p = p * 3125
+		if ( p < 0x80000000) then
+			p = ( p << 1 ) / var1
+		else
+			p = ( p / var1 ) * 2
+		endif
+		var1 = (BME280_DIG_P9 * (((( p >> 3) * (p >> 3)) >> 13))) >> 12
+		var2 = ((( p >> 2)) * BME280_DIG_P8) >> 13
+		p = (p + ((var1 + var2 + BME280_DIG_P7) >> 4))
+	else
+		p = 0
+	endif
+ENDFUNC p

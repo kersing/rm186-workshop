@@ -1,0 +1,118 @@
+//**************************************************************************
+// SDS011 library
+//
+// © Copyright 2019 by The-Box Development
+// written by Jac Kersing
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//**************************************************************************
+
+// SDS011 wiring to Workshop PCB (read silkscreen on PCB!)
+// SDS011 TXD to PCB RX
+// SDS011 RXD to PCB TX
+
+DIM sleep$
+DIM work$
+
+work$="\AA\B4\06\01\01\00\00\00\00\00\00\00\00\00\00\FF\FF\06\AB"
+sleep$="\AA\B4\06\01\00\00\00\00\00\00\00\00\00\00\00\FF\FF\05\AB"
+
+
+SUB SDS011Start()
+	// Enable SDS011 measurement mode
+	DIM rc
+	rc = UartOpen(9600,0,0,"CN81N")
+	UartFlush(3)
+	Sleep(100)
+	rc=UartWrite(work$)
+	Sleep(2000)
+	UartFlush(3)
+	UartClose()
+ENDSUB
+
+SUB SDS011Sleep()
+	// Enable SDS011 sleep mode
+	DIM rc
+	rc = UartOpen(9600,0,0,"CN81N")
+	UartFlush(3)
+	Sleep(100)
+	rc=UartWrite(sleep$)
+	Sleep(2000)
+	UartFlush(3)
+	UartClose()
+ENDSUB
+
+FUNCTION SDS011ReadData(open, close) AS String
+	DIM data$
+	DIM char
+	DIM rc, i
+
+	IF open != 0 THEN
+		rc = UartOpen(9600,0,0,"CN81N")
+	ENDIF
+	
+	UartFlush(3)
+	Sleep(2000)
+
+	// Read single measurement
+	char = 0xAA // Start of data character
+	data$ = ""
+	rc = UartReadMatch(data$,char)
+	IF rc > 0 THEN
+		data$ = ""
+		rc = UartReadN(data$,9)
+		IF rc != 9 THEN
+			data$ =""
+		ELSE
+			// Example data: C0 0B 00 11 00 83 B1 50 AB
+			DIM sum, s1
+			s1 = STRGETCHR(data$,0)
+			IF s1 != 0xC0 THEN
+				data$ = "Commander byte missing"
+			ELSE
+				sum = 0
+				FOR i = 1 TO 6
+					sum = sum + STRGETCHR(data$,i)
+				NEXT
+				sum = sum % 256
+				s1 = STRGETCHR(data$,7)
+				IF s1 != SUM THEN
+					data$ = "Checksum Failed"
+				ENDIF
+			ENDIF
+		ENDIF
+	ELSE
+		data$="Start not found"
+	ENDIF
+ENDFUNC data$
+
+// Keep in mind message header is missing from data when indexing
+FUNCTION SDS011GetPM25(data$) AS INTEGER
+	DIM result, b1, b2
+	b1 = STRGETCHR(data$,1)
+	b2 = STRGETCHR(data$,2)
+	result = (b2 * 256) + b1
+ENDFUNC result
+
+FUNCTION SDS011GetPM10(data$) AS INTEGER
+	DIM result, b1, b2
+	b1 = STRGETCHR(data$,3)
+	b2 = STRGETCHR(data$,4)
+	result = (b2 * 256) + b1
+ENDFUNC result

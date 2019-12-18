@@ -1,0 +1,22 @@
+// Sleep library
+DIM timeout
+
+// Sleep for ms milliseconds
+sub Sleep(ms)
+	// Start Timer 0 as a one-shot timer
+	timeout = 0
+    TIMERSTART(0,ms,0)
+	while timeout == 0
+		waitevent
+	endwhile
+endsub
+
+function HandlerSleepTimer()
+	// Set flag to signal timeout and not some other event.
+	// Then just return 0 so we pass through the next waitevent
+	timeout = 1
+endfunc 0
+
+ONEVENT EVTMR0 				CALL HandlerSleepTimer
+
+
