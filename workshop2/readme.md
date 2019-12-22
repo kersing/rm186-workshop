@@ -23,37 +23,39 @@ Kijk of je data binnen krijgt op TTN. Gebruik de ‘payload_decoder.js’ om de 
 
 ## Voor de beginner:
 ### 1) Connector aan de SDS
-Neem 4 dupont female-female wires. Op de foto staan wit/grijs/bruin/blauw. Pruts aan één kant de 4 female pennen los uit de omhulsels (wip een plastic omhulsel los en haal de pen eruit. Doe deze vier female pinnen in een 5 pins Dupont plastic behuizing. Doe wit/grijs/bruin aan 1 kant, sla 1 gat over en doe de laatste in het vijfde gat. Zie ![foto 1](images/foto1.jpeg). Steek deze gemaakte stekker in de SDS, zo rechts mogelijk. Zie ![foto 2](images/foto2.jpeg).
+Neem 4 dupont female-female wires. Op de foto staan wit/grijs/bruin/blauw. Pruts aan één kant de 4 female pennen los uit de omhulsels (wip een plastic omhulsel los en haal de pen eruit. Doe deze vier female pinnen in een 5 pins Dupont plastic behuizing. Doe wit/grijs/bruin aan 1 kant, sla 1 gat over en doe de laatste in het vijfde gat. ![foto 1](images/foto1.jpeg) Steek deze gemaakte stekker in de SDS, zo rechts mogelijk. ![foto 2](images/foto2.jpeg)
 
 ### 2) SDS aansluiten op node
-Knip de dupont stekkers van de draden bruin/blauw. Strip deze draden ongeveer 8 mm. Doe de grijze draad op TX van J1 en de witte op RX van J1. Zie [foto 3](images/foto3.jpeg). De draden bruin/blauw wordt nu niets mee gedaan.
+Knip de dupont stekkers van de draden bruin/blauw. Strip deze draden ongeveer 8 mm. Doe de grijze draad op TX van J1 en de witte op RX van J1. De draden bruin/blauw wordt nu niets mee gedaan. ![foto 3](images/foto3.jpeg)
 
 ### 3) micro USB
-Soldeer twee draden aan de micro USB op de GND en VCC. Hier zijn grijs gebruikt voor GND en wit voor VCC. Zie [foto 4](images/foto4.jpeg). De VCC is +5V en die is ook nodig om de SDS011 te voeden. De txd/rxd van de SDS011 zijn 3.3V dus die kunnen direct worden aangesloten zonder conversie (zie stap 2). 
+Soldeer twee draden aan de micro USB op de GND en VCC. Hier zijn grijs gebruikt voor GND en wit voor VCC. De VCC is +5V en die is ook nodig om de SDS011 te voeden. De txd/rxd van de SDS011 zijn 3.3V dus die kunnen direct worden aangesloten zonder conversie (zie stap 2). ![foto 4](images/foto4.jpeg)
 
 ### 4) sluit micro USB voeding aan op de node
-Wikkel de witte en blauwe draad om elkaar en schroef deze in het rechter gat van de groene schroefconnector. Dit is de VCC van de micro USB en van de SDS011. Doe hetzelfde met de grijze en bruine draad. Dit zijn de GND van de micro USB en de SDS011. Zie [foto 5](images/foto5.jpeg).
+Wikkel de witte en blauwe draad om elkaar en schroef deze in het rechter gat van de groene schroefconnector. Dit is de VCC van de micro USB en van de SDS011. Doe hetzelfde met de grijze en bruine draad. Dit zijn de GND van de micro USB en de SDS011. ![foto 5](images/foto5.jpeg)
 
 ### 5) Jumper 8
-Jumper 8 bepaalt waar de node zijn voeding vandaan haalt: van de USB->TTL convertor (J8 over bovenste twee pinnen) of de micro USB (J8 over de onderste twee pinnen dus aan de rand van de node). Laat J8 nu op de bovenste twee pinnen. Zie [foto 6](images/foto6.jpeg).
+Jumper 8 bepaalt waar de node zijn voeding vandaan haalt: van de USB->TTL convertor (J8 over bovenste twee pinnen) of de micro USB (J8 over de onderste twee pinnen dus aan de rand van de node). Laat J8 nu op de bovenste twee pinnen. ![foto 6](images/foto6.jpeg)
 
 ### 6) BME
-Soldeer de 2 pin header female op de BME280 op de pinnen SCL en SDA. Knip twee female duping wires op lengte van 6 en 3 cm, soldeer die op de VCC en GND. Hier is rood gebruikt voor VCC en zwart voor GND. Zie [foto 7](images/foto7.jpeg).
+Soldeer de 2 pin header female op de BME280 op de pinnen SCL en SDA. Knip twee female duping wires op lengte van 6 en 3 cm, soldeer die op de VCC en GND. Hier is rood gebruikt voor VCC en zwart voor GND. ![foto 7](images/foto7.jpeg)
 
 ### 7) BME op node
-Plaats de 2 pin header female op de pinnen SCL en SDA van de node. Sluit de zware dupond draad aan op de GND en de rode op de 3v3. Zie [foto 8](images/foto8.jpeg).
+Plaats de 2 pin header female op de pinnen SCL en SDA van de node. Sluit de zware dupond draad aan op de GND en de rode op de 3v3. ![foto 8](images/foto8.jpeg)
 
 ### 8) adem door
 Je hebt het hardware stuk overleefd, op naar de software configuratie.
 
 ### 9) Programmeer de node
-Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los en sluit de USB-TTL convertor aan. Zie [foto 9](images/foto9.jpeg). Programmeer ‘$autorun$sdsbme.sb’ op de node (zie vorige workshop). Als het programmeren gelukt is, haal dan de USB->TTL los, verbind de SDS011 op de juiste wijze met tx en rx (zie stap 2).  
+Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los en sluit de USB-TTL convertor aan. ![foto 9](images/foto9.jpeg) 
+Programmeer ‘$autorun$sdsbme.sb’ op de node (zie vorige workshop). Als het programmeren gelukt is, haal dan de USB->TTL los, verbind de SDS011 op de juiste wijze met tx en rx (zie stap 2).  
 Let op: de node start nu automatisch en je kunt niet een andere file programmeren omdat die niet meer in de programmeermode staat. Hiervoor met je de autorun uitzetten met een dupontwire. Zie vorige workshop.
 
 ### 10) TTN
 Log in op TTN en zoek de data van je device.
 
-### 11) Zet J8 om naar onderen, dus richting de rand van de PCB. Zie [foto 10](images/foto10.jpeg).
+### 11) Zet J8 om naar onderen, dus richting de rand van de PCB. 
+![foto 10](images/foto10.jpeg)
 
 ### 12) start de node
 Voed de node nu met micro USB. De node zal starten en de ventilator van de SDS zal gaan draaien. Als het goed is, zie je in TTN de node zich registreren en om de 5 minuten data versturen. So far so good!
@@ -62,7 +64,9 @@ Voed de node nu met micro USB. De node zal starten en de ventilator van de SDS z
 De node verstuurt de data in een compact formaat. Kopieer de payload_decoder.js van Github naar TTN en je zult zien dat de data betekenis krijgt.
 
 ### 14) monteer alles op het frame
-De micro USB [foto 11](images/foto11.jpeg), de SDS011 [foto 12](images/foto12.jpeg) en de node [foto 13](images/foto13.jpeg).
+De micro USB ![foto 11](images/foto11.jpeg)
+De SDS011 ![foto 12](images/foto12.jpeg) 
+En de node ![foto 13](images/foto13.jpeg)
 
 ### 14) @@TODO data naar RIVM
 Er wordt een gemeenschappelijke applicatie gemaakt op TTN waar iedereen toegang toe krijgt. Je kunt je node hier registreren, de data bekijken. Let erop dat je bij de registratie van de node ook GPS-coordinaten opgeeft (het mag ivm privacy 100 meter afwijken). Dit gebruikt RIVM om de node op een kaart te plaatsen en verplaatsing van verontreiniging te monitoren. RIVM zal met MQTT verbinden met deze applicatie en op deze wijze de data ophalen. Op [RIVM samenmeten](https://samenmeten.rivm.nl/dataportaal/) kun je alle sensoren zien en als het goed is ook die van jou.
