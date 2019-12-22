@@ -23,7 +23,7 @@ Kijk of je data binnen krijgt op TTN. Gebruik de ‘payload_decoder.js’ om de 
 
 ## Voor de beginner:
 ### 1) Connector aan de SDS
-Neem 4 dupont female-female wires. Op de foto staan wit/grijs/bruin/blauw. Pruts aan één kant de 4 female pennen los uit de omhulsels (wip een plastic omhulsel los en haal de pen eruit. Doe deze vier female pinnen in een 5 pins Dupont plastic behuizing. Doe wit/grijs/bruin aan 1 kant, sla 1 gat over en doe de laatste in het vijfde gat. Zie [foto 1](images/foto1.jpeg). Steek deze gemaakte stekker in de SDS, zo rechts mogelijk. Zie [foto 2](images/foto2.jpeg).
+Neem 4 dupont female-female wires. Op de foto staan wit/grijs/bruin/blauw. Pruts aan één kant de 4 female pennen los uit de omhulsels (wip een plastic omhulsel los en haal de pen eruit. Doe deze vier female pinnen in een 5 pins Dupont plastic behuizing. Doe wit/grijs/bruin aan 1 kant, sla 1 gat over en doe de laatste in het vijfde gat. Zie ![foto 1](images/foto1.jpeg). Steek deze gemaakte stekker in de SDS, zo rechts mogelijk. Zie ![foto 2](images/foto2.jpeg).
 
 ### 2) SDS aansluiten op node
 Knip de dupont stekkers van de draden bruin/blauw. Strip deze draden ongeveer 8 mm. Doe de grijze draad op TX van J1 en de witte op RX van J1. Zie [foto 3](images/foto3.jpeg). De draden bruin/blauw wordt nu niets mee gedaan.
