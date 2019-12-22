@@ -47,7 +47,7 @@ Plaats de 2 pin header female op de pinnen SCL en SDA van de node. Sluit de zwar
 Je hebt het hardware stuk overleefd, op naar de software configuratie.
 
 ### 9) Programmeer de node
-Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los en sluit de USB-TTL convertor aan. ![foto 9](images/foto9.jpeg) 
+Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los en sluit de USB-TTL convertor aan (zoals in de vorige workshop, gebruik **niet** de volgorde van de draden zoals op de foto). ![foto 9](images/foto9.jpeg) 
 Programmeer ‘$autorun$.sdsbme.sb’ op de node (zie vorige workshop). Als het programmeren gelukt is, haal dan de USB->TTL los, verbind de SDS011 op de juiste wijze met tx en rx (zie stap 2).  
 Let op: de node start nu automatisch en je kunt niet een andere file programmeren omdat die niet meer in de programmeermode staat. Hiervoor met je de autorun uitzetten met een dupontwire. Zie vorige workshop.
 
