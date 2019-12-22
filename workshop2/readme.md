@@ -13,7 +13,7 @@ Sluit de BME280 aan op I2C, GND en 3.3V van het node.
 Sluit de +5V en GND van de SDS aan op de groene schroefconnector. Als de connector aan de onderkant ligt, is de linker aansluiting GND en de rechteraansluiting +5V. Sluit TXD van de SDS aan op de RX van de node; en dus de RXD van de SDS op de TX van de node. 
 
 ### 4) programmeer node
-Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los, sluit de USB-TTL convertor aan, programmeer ‘sdsbme.sb’ op de node (zie vorige workshop). Als alles goed werkt, dan kun je deze file hernoemen naar ‘$AUTORUN$sdsbme.sb’ zodat die automatisch op start. Om een nieuwe versie te programmeren als een autorun actief is, moet je een aparte verbinding op de node maken (zie vorige workshop). Als het programmeren is gelukt, sluit dan de SDS weer goed aan.
+Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los, sluit de USB-TTL convertor aan, programmeer ‘sdsbme.sb’ op de node (zie vorige workshop). Als alles goed werkt, dan kun je deze file hernoemen naar ‘$autorun$.sdsbme.sb’ en opnieuw uploaden zodat die automatisch op start. Om een nieuwe versie te programmeren als een autorun actief is, moet je een aparte verbinding op de node maken (zie vorige workshop). Als het programmeren is gelukt, sluit dan de SDS weer goed aan.
 
 ### 5) TTN
 Kijk of je data binnen krijgt op TTN. Gebruik de ‘payload_decoder.js’ om de data te decoderen.
@@ -48,7 +48,7 @@ Je hebt het hardware stuk overleefd, op naar de software configuratie.
 
 ### 9) Programmeer de node
 Er is maar 1 seriële poort dus als je de node gaat programmeren, dan moet je de SDS even loshalen en na het programmeren weer aansluiten. Dus haal de SDS los en sluit de USB-TTL convertor aan. ![foto 9](images/foto9.jpeg) 
-Programmeer ‘$autorun$sdsbme.sb’ op de node (zie vorige workshop). Als het programmeren gelukt is, haal dan de USB->TTL los, verbind de SDS011 op de juiste wijze met tx en rx (zie stap 2).  
+Programmeer ‘$autorun$.sdsbme.sb’ op de node (zie vorige workshop). Als het programmeren gelukt is, haal dan de USB->TTL los, verbind de SDS011 op de juiste wijze met tx en rx (zie stap 2).  
 Let op: de node start nu automatisch en je kunt niet een andere file programmeren omdat die niet meer in de programmeermode staat. Hiervoor met je de autorun uitzetten met een dupontwire. Zie vorige workshop.
 
 ### 10) TTN
@@ -69,5 +69,8 @@ De SDS011 ![foto 12](images/foto12.jpeg)
 En de node ![foto 13](images/foto13.jpeg)
 
 ### 14) @@TODO data naar RIVM
-Er wordt een gemeenschappelijke applicatie gemaakt op TTN waar iedereen toegang toe krijgt. Je kunt je node hier registreren, de data bekijken. Let erop dat je bij de registratie van de node ook GPS-coordinaten opgeeft (het mag ivm privacy 100 meter afwijken). Dit gebruikt RIVM om de node op een kaart te plaatsen en verplaatsing van verontreiniging te monitoren. RIVM zal met MQTT verbinden met deze applicatie en op deze wijze de data ophalen. Op [RIVM samenmeten](https://samenmeten.rivm.nl/dataportaal/) kun je alle sensoren zien en als het goed is ook die van jou.
+Er is een gemeenschappelijke applicatie gemaakt op TTN waar iedereen toegang toe krijgt (stuur via Meetup een mail met je TTN account naam naar Jac). Je kunt je node hier registreren, de data bekijken. Let erop dat je bij de registratie van de node ook GPS-coordinaten opgeeft (het mag ivm privacy 100 meter afwijken). Dit gebruikt RIVM om de node op een kaart te plaatsen en verplaatsing van verontreiniging te monitoren. RIVM zal met MQTT verbinden met deze applicatie en op deze wijze de data ophalen. Op [RIVM samenmeten](https://samenmeten.rivm.nl/dataportaal/) kun je alle sensoren zien en als het goed is ook die van jou.
 
+# Behuizing
+Voor de behuizing is [op ThingiVerse](https://www.thingiverse.com/thing:3181167) een ontwerp te vinden. Print de bovenkant, onderkant en een aantal maal het tussenstuk. Print ook een van de twee bevestigingsbeugels. Voor de houder van de onderdelen staat de STL hier op GitHub in de map '3d files'.
+Met 3 stukken op maat gezaagd M4 draadeind en enkele moeren worden alle onderdelen aan elkaar gezet waarna het geheel gemonteerd kan worden. In de buis bevestiging zitten gaten voor tiewraps.
