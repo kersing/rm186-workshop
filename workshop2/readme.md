@@ -1,10 +1,8 @@
 # Fijnstofmeter die data verstuurt naar het RIVM
 
-Instructies fijnstofmeter
-
 Uitgangssituatie: de node kan verbinden met LoRa en je kunt data versturen en ontvangen in TTN. Zie vorige workshop.
 
-## Voor geavanceerde gebruiker:
+## Voor geavanceerde gebruiker
 ### 1) voeding
 Soldeer de +5V en GND op de micro USB dip adapter. Sluit de GND aan op de linker aansluiting van de groene connector (die aan de kant van jumper J8) en de +5V op de rechter connector. Als je de voeding van de micro USB wilt gebruiken, dan moet J8 naar beneden staan (dus naar de rand van de printplaat). Als je de voeding van de USB->TTL convertor wilt gebruiken, dan moet J8 omhoog staan (dus niet aan de rand van de printplaat).
 
