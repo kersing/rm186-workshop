@@ -105,14 +105,24 @@ ENDFUNC data$
 // Keep in mind message header is missing from data when indexing
 FUNCTION SDS011GetPM25(data$) AS INTEGER
 	DIM result, b1, b2
-	b1 = STRGETCHR(data$,1)
-	b2 = STRGETCHR(data$,2)
-	result = (b2 * 256) + b1
+	b1 = STRGETCHR(data$,0)
+	IF b1 == 0xC0 THEN
+		b1 = STRGETCHR(data$,1)
+		b2 = STRGETCHR(data$,2)
+		result = (b2 * 256) + b1
+	ELSE
+		result = -1
+	ENDIF
 ENDFUNC result
 
 FUNCTION SDS011GetPM10(data$) AS INTEGER
 	DIM result, b1, b2
-	b1 = STRGETCHR(data$,3)
-	b2 = STRGETCHR(data$,4)
-	result = (b2 * 256) + b1
+	b1 = STRGETCHR(data$,0)
+	IF b1 == 0xC0 THEN
+		b1 = STRGETCHR(data$,3)
+		b2 = STRGETCHR(data$,4)
+		result = (b2 * 256) + b1
+	ELSE
+		result = -1
+	ENDIF
 ENDFUNC result

@@ -17,14 +17,22 @@
 DIM data$
 DIM rc
 DIM joined
+DIM temp$
 
 // Join is geslaagd
 // Herstart de timer met de interval voor het eerste packet
 function LoraJoined() As Integer
 	// Schedule first transmission
-	PRINT "Joined\n"
+//	PRINT "Joined\n"
 	TimerCancel(1)
 	joined = 1
+
+	// Forceer weer naar SF7
+	// Haal commentaar bij onderstaande twee regels weg als de node
+	// heel goed bereik heeft zodat zo snel mogelijk gezonden wordt
+	//temp$ = "5"
+	//rc = LORAMACSetOption(LORAMAC_OPT_DATA_RATE, temp$)
+
     TimerStart(1, FIRSTINT, 0)
 endfunc 1
 
@@ -51,6 +59,8 @@ FUNCTION SendData() AS Integer
 	DIM pm10
 	DIM pm25
 	Dim BinaryData$
+	DIM datarate$
+	DIM dr$
 
 	// PRINT "SendData, joined = ";joined;"\n"
 	TimerCancel(1)
@@ -62,7 +72,13 @@ FUNCTION SendData() AS Integer
 		// SDS011 PM25 2 bytes unsigned index 6,7
 		// SDS011 PM10 2 bytes unsigned index 8,9
 		BinaryData$ = "\00\00\00\00\00\00\00\00\00\00"
-
+		temp = 0
+		pressure = 0
+		humidity = 0
+		pm25 = 0
+		pm10 = 0 
+		
+		
 		BME280_Read_Raw()
 
 		temp = BME280_Read_Temp()
@@ -79,39 +95,70 @@ FUNCTION SendData() AS Integer
 		Sleep(30000)
 		sds$=SDS011ReadData(1,1)
 		SDS011Sleep()
-		
+
 		iChr = STRGETCHR(sds$,0)
+		// Alleen zenden als er valide fijnstof data gelezen is
 		IF iChr == 0xC0 THEN
 			pm25 = SDS011GetPM25(sds$)
 			pm10 = SDS011GetPM10(sds$)
+
+			iResult = StrSetChr(BinaryData$,temp/256,0)
+			iResult = StrSetChr(BinaryData$,temp%256,1)
+			
+			iResult = StrSetChr(BinaryData$,humidity/256,2)
+			iResult = StrSetChr(BinaryData$,humidity%256,3)
+			
+			
+			iResult = StrSetChr(BinaryData$,pressure/256,4)
+			iResult = StrSetChr(BinaryData$,pressure%256,5)
+
+			iResult = StrSetChr(BinaryData$,pm25/256,6)
+			iResult = StrSetChr(BinaryData$,pm25%256,7)
+
+			iResult = StrSetChr(BinaryData$,pm10/256,8)
+			iResult = StrSetChr(BinaryData$,pm10%256,9)
+			
+
+			// PRINT "Sending data\n"
+			rc = LORAMACTxData(1,BinaryData$,0)
 		ENDIF
-
-		iResult = StrSetChr(BinaryData$,temp/256,0)
-		iResult = StrSetChr(BinaryData$,temp%256,1)
-		
-		iResult = StrSetChr(BinaryData$,humidity/256,2)
-		iResult = StrSetChr(BinaryData$,humidity%256,3)
-		
-		
-		iResult = StrSetChr(BinaryData$,pressure/256,4)
-		iResult = StrSetChr(BinaryData$,pressure%256,5)
-
-		iResult = StrSetChr(BinaryData$,pm25/256,6)
-		iResult = StrSetChr(BinaryData$,pm25%256,7)
-
-		iResult = StrSetChr(BinaryData$,pm10/256,8)
-		iResult = StrSetChr(BinaryData$,pm10%256,9)
-		
-
-		// PRINT "Sending data\n"
-		rc = LORAMACTxData(1,BinaryData$,0)
 		// PRINT "Send rc:";rc;"\n"
-	else
+
+		// Interval afhankelijk van zend snelheid
+		// om binnen de 30 seconden per dag te blijven (fair access policy van TTN)
+		// (Werkelijke interval is + 30 seconden ivm lezen fijnstof sensor)
+		rc = LORAMACGetOption(LORAMAC_OPT_DATA_RATE, datarate$)
+		IF rc == 0 THEN
+			dr$ = "5"
+			IF StrCmp(datarate$, dr$) == 0 THEN
+				TimerStart(1, 120 * 1000, 0)
+			ELSE
+				dr$ = "4"
+				IF StrCmp(datarate$, dr$) == 0 THEN
+					TimerStart(1, 240 * 1000, 0)
+				ELSE
+					dr$ = "3"
+					IF StrCmp(datarate$, dr$) == 0 THEN
+						TimerStart(1, 480 * 1000, 0)
+					ELSE
+						dr$ = "2"
+						IF StrCmp(datarate$, dr$) == 0 THEN
+							TimerStart(1, 960 * 1000, 0)
+						ELSE
+							TimerStart(1, 30 * 60 * 1000, 0)
+						ENDIF
+					ENDIF
+				ENDIF
+			ENDIF
+		ELSE
+			TimerStart(1, INTERVAL, 0)
+		ENDIF
+	ELSE
 		// PRINT "Attemp join again\n"
 		rc = LORAMACJoin(1)
-	endif
-	TimerStart(1, INTERVAL, 0)
-endfunc 1
+		TimerStart(1, INTERVAL, 0)
+	ENDIF
+ENDFUNC 1
 
 // Handel fout condities af. (Negeer ze gewoon)
 SUB HandleOnError()
@@ -120,7 +167,7 @@ ENDSUB
 
 // Handel ontvangen data af (negeer voor nu)
 FUNCTION LoraRxData() as INTEGER
-	PRINT "Data received"
+	//PRINT "Data received"
 ENDFUNC 1
 
 // main code, zet alle event handlers.
@@ -139,7 +186,7 @@ data$ = ""
 // Initialiseer BME sensor
 rc = BME280_Open(BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,BME280_OVERSAMPLE1,0)
 if (rc == 0) then
-    print "BME open\nRead callibration\n"
+    // print "BME open\nRead callibration\n"
     BME280_ReadCallibarationVals()
 
 	Sleep(2000)
@@ -148,21 +195,19 @@ if (rc == 0) then
 	UartClose()
 	
 	// Set SDS011 to sleep
-	rc = UartOpen(9600,0,0,"CN81N")
-	UartFlush(3)
-	Sleep(100)
-	rc=UartWrite(sleep$)
-	Sleep(2000)
-	UartFlush(3)
-	UartClose()
+	SDS011Sleep()
 
-    PRINT "\nstarting LoRaWAN operation\n"
+    // PRINT "\nstarting LoRaWAN operation\n"
 
     // Start LoRaWAN, Start timer en start Join procedure
     joined = 0
     
-	PRINT "Start joining\n"
-	PRINT "Be sure to disconnect tx/rx from Laird because of SDS011.\n"
+	// Zet naar SF7
+	temp$ = "5"
+	rc = LORAMACSetOption(LORAMAC_OPT_DATA_RATE, temp$)
+
+	// PRINT "Start joining\n"
+	// PRINT "Be sure to disconnect tx/rx from Laird because of SDS011.\n"
     rc = LORAMACJoin(1)
 
     TimerStart(1, INTERVAL, 0)
@@ -178,13 +223,3 @@ else
     print rc
     print "\n Leaving application, nothing to do!\n"
 endif
-
-
-
-
-
-
-
-
-
-

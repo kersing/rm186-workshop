@@ -119,6 +119,7 @@ FUNCTION BME280_Open(temp_sample, hum_sample, press_sample, mode)
     BME280_fetchmode = mode
     BME280_Write(BME280_REG_RESET, 0xb6)
     Sleep(200)
+    //BME280_Write(BME280_REG_CONFIG, 0x00)
 ENDFUNC BME280_rc
 
 SUB BME280_Close()
@@ -168,6 +169,7 @@ SUB BME280_Read_Raw()
     BME280_Write(BME280_REG_CTRL_MEAS, mode)
     mode = 245 + 230 * (BME280_temperature_sampling + BME280_pressure_sampling + BME280_humidity_sampling)
     Sleep(mode / 10)
+	//Sleep (5000)
 	
 	BME280_raw_press = ((BME280_Read(BME280_REG_PRESS_MSB) << 16) + ( BME280_Read(BME280_REG_PRESS_LSB) << 8) + BME280_Read(BME280_REG_PRESS_LSB)) >> 4
 	BME280_raw_temp = ( (BME280_Read(BME280_REG_TEMP_MSB) << 16) + ( BME280_Read(BME280_REG_TEMP_LSB) << 8 ) + BME280_Read(BME280_REG_TEMP_XLSB)) >> 4
@@ -208,7 +210,7 @@ FUNCTION BME280_Read_Humidity()
     if (var5 < 0) then
         var5 = 0
     endif
-
+	//var5 = (var5 < 0 ? 0 : var5)
     if (var5 > 419430400) then
         var5 = 419430400
     endif
@@ -216,6 +218,7 @@ FUNCTION BME280_Read_Humidity()
     if (var5 > 100000) then
         var5 = 100000
     endif
+	//var5 = (var5 > 419430400 ? 419430400 : var5)
 ENDFUNC var5
 
 FUNCTION BME280_Read_Pressure()
